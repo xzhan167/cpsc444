@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RoomieDuty – Notifications</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#f3f4f6;color:#111}
+.app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+.aside{background:#e5e7eb;border-right:1px solid #d1d5db;display:flex;flex-direction:column;gap:16px;padding:16px}
+.brand{display:grid;place-items:center;height:80px;background:#fff;border-radius:12px;font-weight:800}
+.menu a{display:block;text-decoration:none;color:#111;padding:12px;border-radius:10px;margin-bottom:8px;background:#dbeafe}
+.menu a:nth-child(2){background:#e0f2fe}
+.menu a:nth-child(3){background:#e2e8f0}
+.menu a:nth-child(4){background:#fee2e2}
+.menu a:nth-child(5){background:#dcfce7}
+.footer{margin-top:auto;background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:12px;display:grid;gap:8px}
+.footer label{font-size:12px;color:#374151}
+.footer input{width:100%;padding:8px;border:1px solid #d1d5db;border-radius:8px}
+.footer .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.footer button{padding:10px 12px;border-radius:10px;border:1px solid #c7d2fe;background:#dbeafe}
+.main{padding:24px}
+.h1{font-size:40px;font-weight:800;margin:0 0 12px}
+.legend{display:flex;gap:16px;background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px;margin-bottom:16px}
+.dot{width:10px;height:10px;border-radius:999px;display:inline-block;margin-right:6px}
+.dot.you{background:#93c5fd}
+.dot.sarah{background:#c4b5fd}
+.dot.emma{background:#86efac}
+.list{display:grid;gap:12px}
+.card{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:14px}
+.avatar{width:28px;height:28px;border-radius:999px;display:grid;place-items:center;font-weight:700;font-size:12px;color:#111}
+.color-you{background:#dbeafe}
+.color-sarah{background:#ede9fe}
+.color-emma{background:#dcfce7}
+.color-other{background:#e5e7eb}
+.type{font-weight:600;margin-right:6px}
+.meta{color:#6b7280;font-size:12px}
+.del{border:1px solid #d1d5db;border-radius:10px;background:#f9fafb;padding:8px 10px}
+.small{font-size:12px;color:#6b7280}
+.toast{position:fixed;right:16px;bottom:16px;background:#111;color:#fff;padding:10px 14px;border-radius:10px;opacity:0;transform:translateY(8px);transition:.2s}
+.toast.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="aside">
+    <div class="brand">ROOMIE DUTY</div>
+    <nav class="menu">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="notifications.html">Notifications</a>
+      <a href="rules.html">House Rules</a>
+      <a href="calendar.html">Calendar</a>
+      <a href="proposals.html">Proposals</a>
+    </nav>
+    <div class="footer">
+      <label for="todayInput">Set today's date</label>
+      <input id="todayInput" type="date" />
+      <div class="row">
+        <button id="setTodayBtn">Set Today</button>
+        <button id="downloadJsonBtn">Download JSON</button>
+      </div>
+      <div class="small" id="todayHint"></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="h1">Notifications</div>
+    <div class="legend">
+      <div><span class="dot you"></span>Me</div>
+      <div><span class="dot sarah"></span>Sarah</div>
+      <div><span class="dot emma"></span>Emma</div>
+    </div>
+    <div id="list" class="list"></div>
+  </main>
+</div>
+
+<div id="toast" class="toast">Saved</div>
+
+<script src="roomieduty.js"></script>
+<script>
+let cfg = null;
+
+function avatarFor(name){
+  const cls = RoomieDuty.classForAssignee(name);
+  const span = document.createElement("div");
+  span.className = "avatar " + cls;
+  span.textContent = (name || "?").trim().charAt(0).toUpperCase();
+  return span;
+}
+
+function render(){
+  const t0 = RoomieDuty.getTodayDate(cfg);
+  document.getElementById("todayInput").value = t0.toISOString().slice(0, 10);
+  document.getElementById("todayHint").textContent = "Using today: " + document.getElementById("todayInput").value;
+
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  const items = RoomieDuty.buildReminders(cfg, t0).sort(function(a, b){
+    const ad = a.date || "1970-01-01";
+    const bd = b.date || "1970-01-01";
+    return RoomieDuty.parseISO(bd) - RoomieDuty.parseISO(ad);
+  });
+
+  items.forEach(function(r){
+    const row = document.createElement("div");
+    row.className = "card";
+
+    const left = avatarFor(r.who || "Other");
+
+    const mid = document.createElement("div");
+    const title = document.createElement("div");
+    title.innerHTML = `<span class="type">${r.label}:</span> ${r.title}`;
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    meta.textContent = r.date ? RoomieDuty.fmtDate(RoomieDuty.parseISO(r.date)) : "";
+    mid.appendChild(title);
+    mid.appendChild(meta);
+
+    const del = document.createElement("button");
+    del.className = "del";
+    del.textContent = "🗑";
+    del.addEventListener("click", function(){
+      RoomieDuty.dismissReminder(cfg, r.id);
+      render();
+      RoomieDuty.showToast("Dismissed");
+    });
+
+    row.appendChild(left);
+    row.appendChild(mid);
+    row.appendChild(del);
+    list.appendChild(row);
+  });
+
+  RoomieDuty.setupFooterControls(cfg, render);
+}
+
+function init(){
+  RoomieDuty.loadConfig().then(function(data){
+    cfg = data;
+    render();
+  }).catch(function(){
+    cfg = {
+      today: null,
+      tasks: [],
+      proposals: [],
+      notificationsDismissed: []
+    };
+    render();
+  });
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>

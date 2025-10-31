@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RoomieDuty – House Rules</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#f3f4f6;color:#111}
+.app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+.aside{background:#e5e7eb;border-right:1px solid #d1d5db;display:flex;flex-direction:column;gap:16px;padding:16px}
+.brand{display:grid;place-items:center;height:80px;background:#fff;border-radius:12px;font-weight:800}
+.menu a{display:block;text-decoration:none;color:#111;padding:12px;border-radius:10px;margin-bottom:8px;background:#e2e8f0}
+.menu a:nth-child(1){background:#dbeafe}
+.menu a:nth-child(2){background:#e0f2fe}
+.menu a:nth-child(4){background:#fee2e2}
+.menu a:nth-child(5){background:#dcfce7}
+.footer{margin-top:auto;background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:12px;display:grid;gap:8px}
+.footer label{font-size:12px;color:#374151}
+.footer input{width:100%;padding:8px;border:1px solid #d1d5db;border-radius:8px}
+.footer .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.footer button{padding:10px 12px;border-radius:10px;border:1px solid #c7d2fe;background:#dbeafe}
+.main{padding:24px}
+.h1{font-size:40px;font-weight:800;margin:0 0 16px}
+.headerrow{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.btn{padding:10px 12px;border-radius:10px;border:1px solid #c7d2fe;background:#dbeafe}
+.list{display:grid;gap:12px}
+.rule{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:12px;display:grid;grid-template-columns:1fr 120px 40px;gap:10px}
+.rule .meta{display:grid;grid-template-columns:1fr;gap:8px}
+.rule input,.rule textarea{width:100%;padding:8px;border:1px solid #d1d5db;border-radius:8px;background:#fff}
+.rule textarea{min-height:72px;resize:vertical}
+.small{font-size:12px;color:#6b7280}
+.toast{position:fixed;right:16px;bottom:16px;background:#111;color:#fff;padding:10px 14px;border-radius:10px;opacity:0;transform:translateY(8px);transition:.2s}
+.toast.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="aside">
+    <div class="brand">ROOMIE DUTY</div>
+    <nav class="menu">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="notifications.html">Notifications</a>
+      <a href="rules.html">House Rules</a>
+      <a href="calendar.html">Calendar</a>
+      <a href="proposals.html">Proposals</a>
+    </nav>
+    <div class="footer">
+      <label for="todayInput">Set today's date</label>
+      <input id="todayInput" type="date" />
+      <div class="row">
+        <button id="setTodayBtn">Set Today</button>
+        <button id="downloadJsonBtn">Download JSON</button>
+      </div>
+      <div class="small" id="todayHint"></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="h1">House Rules</div>
+    <div class="headerrow">
+      <div class="small">Title, Description, Added</div>
+      <button id="addRuleBtn" class="btn">Add New Rule</button>
+    </div>
+    <div id="rules" class="list"></div>
+  </main>
+</div>
+
+<div id="toast" class="toast">Saved</div>
+
+<script src="roomieduty.js"></script>
+<script>
+let cfg = null;
+
+function render(){
+  RoomieDuty.ensureArrays(cfg);
+  const t0 = RoomieDuty.getTodayDate(cfg);
+  document.getElementById("todayInput").value = t0.toISOString().slice(0, 10);
+  document.getElementById("todayHint").textContent = "Using today: " + document.getElementById("todayInput").value;
+
+  const wrap = document.getElementById("rules");
+  wrap.innerHTML = "";
+
+  const items = [...cfg.rules].sort(function(a, b){
+    return RoomieDuty.parseISO(b.added || "1970-01-01") - RoomieDuty.parseISO(a.added || "1970-01-01");
+  });
+
+  items.forEach(function(r){
+    const row = document.createElement("div");
+    row.className = "rule";
+
+    const meta = document.createElement("div");
+    meta.className = "meta";
+
+    const title = document.createElement("input");
+    title.value = r.title || "";
+    title.addEventListener("input", function(){
+      r.title = title.value;
+    });
+
+    const desc = document.createElement("textarea");
+    desc.value = r.description || "";
+    desc.addEventListener("input", function(){
+      r.description = desc.value;
+    });
+
+    meta.appendChild(title);
+    meta.appendChild(desc);
+
+    const added = document.createElement("input");
+    added.type = "date";
+    added.value = r.added || t0.toISOString().slice(0, 10);
+    added.addEventListener("change", function(){
+      r.added = added.value;
+    });
+
+    const del = document.createElement("button");
+    del.className = "btn";
+    del.textContent = "🗑";
+    del.addEventListener("click", function(){
+      cfg.rules = cfg.rules.filter(function(x){
+        return x.id !== r.id;
+      });
+      render();
+      RoomieDuty.showToast("Deleted");
+    });
+
+    row.appendChild(meta);
+    row.appendChild(added);
+    row.appendChild(del);
+    wrap.appendChild(row);
+  });
+
+  RoomieDuty.setupFooterControls(cfg, render);
+}
+
+function addRule(){
+  RoomieDuty.ensureArrays(cfg);
+  const d = RoomieDuty.getTodayDate(cfg).toISOString().slice(0, 10);
+  const item = {
+    id: RoomieDuty.uid(),
+    title: "New Rule",
+    description: "Description",
+    added: d
+  };
+  cfg.rules.push(item);
+  render();
+  RoomieDuty.showToast("Added");
+}
+
+function init(){
+  RoomieDuty.loadConfig().then(function(data){
+    cfg = data;
+    render();
+  }).catch(function(){
+    cfg = {
+      today: null,
+      tasks: [],
+      notifications: [],
+      rules: []
+    };
+    render();
+  });
+
+  document.getElementById("addRuleBtn").addEventListener("click", addRule);
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>

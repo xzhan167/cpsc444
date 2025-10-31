@@ -58,32 +58,16 @@ const RoomieDuty = (function(){
       };
     }
   
-    function assigneeKey(name){
-      const n = (name || "").toLowerCase().trim();
-      if(n === "you" || n === "me" || n === "a"){
-        return "you";
+    function showToast(msg){
+      const el = document.getElementById("toast");
+      if(!el){
+        return;
       }
-      if(n.indexOf("emma") !== -1){
-        return "emma";
-      }
-      if(n.indexOf("sarah") !== -1){
-        return "sarah";
-      }
-      return "other";
-    }
-  
-    function classForAssignee(name){
-      const k = assigneeKey(name);
-      if(k === "you"){
-        return "color-you";
-      }
-      if(k === "emma"){
-        return "color-emma";
-      }
-      if(k === "sarah"){
-        return "color-sarah";
-      }
-      return "color-other";
+      el.textContent = msg;
+      el.classList.add("show");
+      setTimeout(function(){
+        el.classList.remove("show");
+      }, 1200);
     }
   
     async function loadConfig(){
@@ -95,7 +79,7 @@ const RoomieDuty = (function(){
         throw new Error("Failed to fetch tasks.json");
       }
       const data = await res.json();
-      return data;
+      return ensureArrays(data);
     }
   
     function downloadUpdatedJson(cfg){
@@ -125,10 +109,62 @@ const RoomieDuty = (function(){
         }
         setTodayStorage(v);
         renderFn();
+        showToast("Today set to " + v);
       });
       document.getElementById("downloadJsonBtn").addEventListener("click", function(){
         downloadUpdatedJson(cfg);
       });
+    }
+  
+    function ensureArrays(cfg){
+      if(!cfg.tasks){
+        cfg.tasks = [];
+      }
+      if(!cfg.notes){
+        cfg.notes = [];
+      }
+      if(!cfg.notificationsDismissed){
+        cfg.notificationsDismissed = [];
+      }
+      if(!cfg.proposals){
+        cfg.proposals = [];
+      }
+      if(!cfg.rules){
+        cfg.rules = [];
+      }
+      return cfg;
+    }
+  
+    function uid(){
+      return String(Date.now()) + "_" + Math.random().toString(36).slice(2, 8);
+    }
+  
+    function assigneeKey(name){
+      const n = (name || "").toLowerCase().trim();
+      if(n === "you" || n === "me" || n === "a"){
+        return "you";
+      }
+      if(n.indexOf("emma") !== -1){
+        return "emma";
+      }
+      if(n.indexOf("sarah") !== -1){
+        return "sarah";
+      }
+      return "other";
+    }
+  
+    function classForAssignee(name){
+      const k = assigneeKey(name);
+      if(k === "you"){
+        return "color-you";
+      }
+      if(k === "emma"){
+        return "color-emma";
+      }
+      if(k === "sarah"){
+        return "color-sarah";
+      }
+      return "color-other";
     }
   
     function renderMonthGrid(container, year, month){
@@ -154,6 +190,49 @@ const RoomieDuty = (function(){
       }
     }
   
+    function buildReminders(cfg, t0){
+      const isoToday = t0.toISOString().slice(0, 10);
+      const reminders = [];
+      (cfg.tasks || []).forEach(function(t){
+        if(t.date === isoToday){
+          const id = "task|" + t.date + "|" + t.title;
+          reminders.push({
+            id: id,
+            type: "task",
+            label: "Task soon",
+            title: t.title,
+            who: t.assignee || "",
+            date: t.date
+          });
+        }
+      });
+      (cfg.proposals || []).forEach(function(p){
+        const id = "proposal|" + (p.status || "pending") + "|" + (p.id || p.title);
+        const label = p.status === "passed" ? "Proposal passed" : "Proposal pending";
+        reminders.push({
+          id: id,
+          type: "proposal",
+          label: label,
+          title: p.title || "",
+          who: p.proposer || "",
+          date: p.dateSubmitted || ""
+        });
+      });
+      const dismissed = new Set(cfg.notificationsDismissed || []);
+      return reminders.filter(function(r){
+        return !dismissed.has(r.id);
+      });
+    }
+  
+    function dismissReminder(cfg, id){
+      if(!cfg.notificationsDismissed){
+        cfg.notificationsDismissed = [];
+      }
+      if(!cfg.notificationsDismissed.includes(id)){
+        cfg.notificationsDismissed.push(id);
+      }
+    }
+  
     return {
       parseISO: parseISO,
       todayFromStorage: todayFromStorage,
@@ -161,11 +240,17 @@ const RoomieDuty = (function(){
       getTodayDate: getTodayDate,
       fmtDate: fmtDate,
       weekBinRange: weekBinRange,
-      assigneeKey: assigneeKey,
-      classForAssignee: classForAssignee,
+      showToast: showToast,
       loadConfig: loadConfig,
       downloadUpdatedJson: downloadUpdatedJson,
       setupFooterControls: setupFooterControls,
-      renderMonthGrid: renderMonthGrid
+      ensureArrays: ensureArrays,
+      uid: uid,
+      assigneeKey: assigneeKey,
+      classForAssignee: classForAssignee,
+      renderMonthGrid: renderMonthGrid,
+      buildReminders: buildReminders,
+      dismissReminder: dismissReminder
     };
   })();
+  

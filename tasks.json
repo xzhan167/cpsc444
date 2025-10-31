@@ -1,24 +1,249 @@
 {
-    "today": "2025-10-20",
-    "notes": [
-      {"label": "C", "assignee": "Sarah", "start": "2025-10-19", "end": "2025-10-25"}
-    ],
-    "tasks": [
-      {"date": "2025-10-12", "title": "Mop second room floors", "assignee": "You"},
-      {"date": "2025-10-12", "title": "Scrub kitchen sink", "assignee": "Emma"},
-      {"date": "2025-10-12", "title": "Clean stove top", "assignee": "Emma"},
-      {"date": "2025-10-13", "title": "Organize pantry", "assignee": "Sarah"},
-      {"date": "2025-10-14", "title": "Mop first room floors 10AM", "assignee": "You"},
-      {"date": "2025-10-14", "title": "Clean blinds 4PM", "assignee": "Emma"},
-      {"date": "2025-10-14", "title": "Clean mirrors 6PM", "assignee": "You"},
-      {"date": "2025-10-14", "title": "Scrub toaster 11AM", "assignee": "Sarah"},
-      {"date": "2025-10-15", "title": "Check for expired food 12AM", "assignee": "Sarah"},
-      {"date": "2025-10-15", "title": "Clean ceiling fan 4PM", "assignee": "Emma"},
-      {"date": "2025-10-15", "title": "Clean oven 2PM", "assignee": "Sarah"},
-      {"date": "2025-10-16", "title": "Empty trash can 1PM", "assignee": "You"},
-      {"date": "2025-10-17", "title": "Change bed sheets 10AM", "assignee": "Emma"},
-      {"date": "2025-10-22", "title": "Cut grass 4PM", "assignee": "Emma"},
-      {"date": "2025-10-23", "title": "Clean living room 4PM", "assignee": "You & Emma"},
-      {"date": "2025-10-25", "title": "Vacuum master bedroom 4PM", "assignee": "You"}
-    ]
-  }  
+  "today": "2025-10-20",
+  "notes": [
+    {
+      "label": "C",
+      "assignee": "Sarah",
+      "start": "2025-10-19",
+      "end": "2025-10-25"
+    }
+  ],
+  "tasks": [
+    {
+      "date": "2025-10-12",
+      "title": "Mop second room floors",
+      "assignee": "You"
+    },
+    {
+      "date": "2025-10-12",
+      "title": "Scrub kitchen sink",
+      "assignee": "Emma"
+    },
+    {
+      "date": "2025-10-12",
+      "title": "Clean stove top",
+      "assignee": "Emma"
+    },
+    {
+      "date": "2025-10-13",
+      "title": "Organize pantry",
+      "assignee": "Sarah"
+    },
+    {
+      "date": "2025-10-14",
+      "title": "Mop first room floors 10AM",
+      "assignee": "You"
+    },
+    {
+      "date": "2025-10-14",
+      "title": "Clean blinds 4PM",
+      "assignee": "Emma"
+    },
+    {
+      "date": "2025-10-14",
+      "title": "Clean mirrors 6PM",
+      "assignee": "You"
+    },
+    {
+      "date": "2025-10-14",
+      "title": "Scrub toaster 11AM",
+      "assignee": "Sarah"
+    },
+    {
+      "date": "2025-10-15",
+      "title": "Check for expired food 12AM",
+      "assignee": "Sarah"
+    },
+    {
+      "date": "2025-10-15",
+      "title": "Clean ceiling fan 4PM",
+      "assignee": "Emma"
+    },
+    {
+      "date": "2025-10-15",
+      "title": "Clean oven 2PM",
+      "assignee": "Sarah"
+    },
+    {
+      "date": "2025-10-16",
+      "title": "Empty trash can 1PM",
+      "assignee": "You"
+    },
+    {
+      "date": "2025-10-17",
+      "title": "Change bed sheets 10AM",
+      "assignee": "Emma"
+    },
+    {
+      "date": "2025-10-22",
+      "title": "Cut grass 4PM",
+      "assignee": "Emma"
+    },
+    {
+      "date": "2025-10-23",
+      "title": "Clean living room 4PM",
+      "assignee": "You & Emma"
+    },
+    {
+      "date": "2025-10-25",
+      "title": "Vacuum master bedroom 4PM",
+      "assignee": "You"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "seed_n1",
+      "title": "Task Reminder",
+      "actor": "System",
+      "type": "Task Reminder",
+      "date": "2025-10-20"
+    },
+    {
+      "id": "seed_n2",
+      "title": "Task Completed",
+      "actor": "Sarah",
+      "type": "Task Completed",
+      "date": "2025-10-19"
+    },
+    {
+      "id": "seed_n3",
+      "title": "New Proposal",
+      "actor": "Emma",
+      "type": "New Proposal",
+      "date": "2025-10-18"
+    },
+    {
+      "id": "seed_n4",
+      "title": "New Proposal",
+      "actor": "Me",
+      "type": "New Proposal",
+      "date": "2025-10-17"
+    },
+    {
+      "id": "seed_n5",
+      "title": "Task Reminder",
+      "actor": "System",
+      "type": "Task Reminder",
+      "date": "2025-10-16"
+    },
+    {
+      "id": "seed_n6",
+      "title": "Task Completed",
+      "actor": "Sarah",
+      "type": "Task Completed",
+      "date": "2025-10-15"
+    },
+    {
+      "id": "seed_n7",
+      "title": "Proposal Approved",
+      "actor": "System",
+      "type": "Proposal Approved",
+      "date": "2025-10-14"
+    }
+  ],
+  "rules": [
+    {
+      "id": "seed_r1",
+      "title": "Guest Policy",
+      "description": "Notify roommates 24hrs in advance if having overnight guests.",
+      "added": "2025-09-05"
+    },
+    {
+      "id": "seed_r2",
+      "title": "Clean Dishes",
+      "description": "Please clean your own dishes after use, wipe and store them away.",
+      "added": "2025-09-10"
+    },
+    {
+      "id": "seed_r3",
+      "title": "Shared Expenses",
+      "description": "All shared expenses (utilities, groceries) are split equally and paid by the 1st of each month.",
+      "added": "2025-09-12"
+    },
+    {
+      "id": "seed_r4",
+      "title": "Morning Bathroom Schedule",
+      "description": "Morning slots: Sarah (6–7am), Me (7–8am), Alex (8–9am), Emma (9–10am).",
+      "added": "2025-10-05"
+    },
+    {
+      "id": "seed_r5",
+      "title": "Shared Supplies",
+      "description": "If you finish a shared item (like soap or toilet paper), replace it or let everyone know right away.",
+      "added": "2025-10-08"
+    },
+    {
+      "id": "seed_r6",
+      "title": "Fridge Etiquette",
+      "description": "Label your food and avoid taking items that aren’t yours without asking first.",
+      "added": "2025-10-15"
+    }
+  ],
+  "proposals": [
+    {
+      "id": "p_rotating_cleaning",
+      "title": "Rotating Cleaning Schedule",
+      "category": "Chores",
+      "description": "Weekly rotating bathroom cleaning schedule every Sunday.",
+      "proposer": "Emma",
+      "audience": "All",
+      "dateSubmitted": "2025-10-06",
+      "status": "pending"
+    },
+    {
+      "id": "p_clean_shower_drain",
+      "title": "Clean Shower Drain",
+      "category": "Chores",
+      "description": "Take turns unclogging the shower drain when needed.",
+      "proposer": "Anonymous to Sarah",
+      "audience": "Sarah",
+      "dateSubmitted": "2025-10-08",
+      "status": "pending"
+    },
+    {
+      "id": "p_biweekly_meeting",
+      "title": "Biweekly House Meeting",
+      "category": "Organization",
+      "description": "Biweekly meetings to sync on chores, plans, and concerns.",
+      "proposer": "Me",
+      "audience": "All",
+      "dateSubmitted": "2025-10-02",
+      "status": "passed",
+      "decisionDate": "2025-10-03"
+    },
+    {
+      "id": "p_new_dishwasher",
+      "title": "Get a New Dishwasher",
+      "category": "Purchase",
+      "description": "Pool money to buy a dishwasher for the kitchen.",
+      "proposer": "Sarah",
+      "audience": "All",
+      "dateSubmitted": "2025-09-28",
+      "status": "passed",
+      "decisionDate": "2025-09-30"
+    },
+    {
+      "id": "p_morning_bathroom_slots",
+      "title": "Morning Bathroom Slots",
+      "category": "Organization",
+      "description": "Assign morning bathroom windows.",
+      "proposer": "Me",
+      "audience": "All",
+      "dateSubmitted": "2025-09-25",
+      "status": "passed",
+      "decisionDate": "2025-09-26"
+    },
+    {
+      "id": "p_shared_supplies",
+      "title": "Shared Supplies",
+      "category": "Chores",
+      "description": "Replace shared supplies or notify the group.",
+      "proposer": "Emma",
+      "audience": "All",
+      "dateSubmitted": "2025-09-20",
+      "status": "passed",
+      "decisionDate": "2025-09-21"
+    }
+  ]
+}
+ 
