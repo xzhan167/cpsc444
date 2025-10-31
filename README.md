@@ -139,7 +139,7 @@ https://stackoverflow.com/questions/24816/disable-form-submit-without-jquery
 
 https://stackoverflow.com/questions/11821261/how-to-get-all-selected-values-from-select-multiple-html-element
 
-parting from ISO:
+parsing from ISO:
 
 https://stackoverflow.com/questions/17450043/javascript-slice-string-without-splitting
 
