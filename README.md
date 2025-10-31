@@ -7,7 +7,9 @@ SETTING UP:
 1) Installing python:
 
 Windows: https://www.python.org/downloads/
+
 MacOS: brew install python
+
 Linux:
 sudo apt update
 sudo apt install python3 python3-pip
@@ -17,11 +19,13 @@ Verify that python is correctly installed with: python --version
 2) run local server from ur project folder, you can use command "cd pathToYourLocalProjectHere" or simply open a new command prompt or terminal at the project foler by right clicking on the folder and choosing to open a cmd or terminal.
 
 Run the following command from the project folder (MUST BE FROM PROJECT FOLDER):
+
 python -m http.server 8000
 
 This will start a local server, as browsers by default blocks JSON fetch requests.
 
 3) open up any web browser and paste the below into the address bar, then press enter:
+
 http://localhost:8000/dashboard.html
 
 Congrats, now you have a local version of the app running!
