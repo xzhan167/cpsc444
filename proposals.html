@@ -185,7 +185,7 @@ function proposalRow(p){
   top.className = "row";
 
   const title = document.createElement("div");
-  title.textContent = p.title + " • " + (p.proposedDate || "") + (p.proposedTime ? " " + p.proposedTime : "");
+  title.textContent = p.title + " " + (p.proposedDate || "") + (p.proposedTime ? " " + p.proposedTime : "");
 
   const status = document.createElement("div");
   status.className = "badge";
@@ -196,7 +196,7 @@ function proposalRow(p){
 
   const meta = document.createElement("div");
   meta.className = "meta";
-  meta.textContent = (p.dateSubmitted || "") + " • proposed by " + (p.proposer || "") + " • " + (p.members || []).join(", ");
+  meta.textContent = (p.dateSubmitted || "") + " proposed by " + (p.proposer || "") + " " + (p.members || []).join(", ");
 
   const desc = document.createElement("div");
   desc.textContent = p.description || "";
@@ -303,17 +303,20 @@ function submitProposal(){
     return;
   }
 
-  const p = {
-    id: RoomieDuty.uid(),
-    title: title,
-    members: members,
-    description: desc,
-    proposedDate: date,
-    proposedTime: time,
-    proposer: proposer,
-    status: "pending",
-    dateSubmitted: new Date().toISOString().slice(0,10)
-  };
+  const todayISO = RoomieDuty.todayFromStorage() || (cfg.today || new Date().toISOString().slice(0,10));
+
+    const p = {
+     id: RoomieDuty.uid(),
+     title: title,
+     members: members,
+     description: desc,
+     proposedDate: date,
+     proposedTime: time,
+     proposer: proposer,
+     status: "pending",
+     dateSubmitted: todayISO
+    };
+
   cfg.proposals.push(p);
 
   document.getElementById("pTitle").value = "";
@@ -348,7 +351,6 @@ function init(){
 
   document.getElementById("pDate").addEventListener("change", refreshMiniCal);
   document.getElementById("submitBtn").addEventListener("click", submitProposal);
-
   document.getElementById("testingBtn").addEventListener("click", function(){
     TestMode.toggle();
     render();
@@ -359,3 +361,4 @@ document.addEventListener("DOMContentLoaded", init);
 </script>
 </body>
 </html>
+

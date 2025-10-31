@@ -32,3 +32,5 @@ Congrats, now you have a local version of the app running!
 Keep track of changes and load your changes by downloading the JSON (your saved data) every time you make a change, replace the local version by the downloaded version in your project directory then refresh to see it changed permanently!
 
 This functionality is limited as due to a lack of server hosting, we dont have an easy way to save and update the config file, as such, you must do so manually.
+
+Testing is best done on incognito browser mode, as it would erase any previous data.

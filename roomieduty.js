@@ -102,18 +102,24 @@ const RoomieDuty = (function(){
     }
   
     function setupFooterControls(cfg, renderFn){
-      document.getElementById("setTodayBtn").addEventListener("click", function(){
-        const v = document.getElementById("todayInput").value;
-        if(!v){
-          return;
-        }
-        setTodayStorage(v);
-        renderFn();
-        showToast("Today set to " + v);
-      });
-      document.getElementById("downloadJsonBtn").addEventListener("click", function(){
-        downloadUpdatedJson(cfg);
-      });
+      const btn = document.getElementById("setTodayBtn");
+      if(btn){
+        btn.addEventListener("click", function(){
+          const v = document.getElementById("todayInput").value;
+          if(!v){
+            return;
+          }
+          setTodayStorage(v);
+          renderFn();
+          showToast("Today set to " + v);
+        });
+      }
+      const dl = document.getElementById("downloadJsonBtn");
+      if(dl){
+        dl.addEventListener("click", function(){
+          downloadUpdatedJson(cfg);
+        });
+      }
     }
   
     function ensureArrays(cfg){
@@ -190,6 +196,82 @@ const RoomieDuty = (function(){
       }
     }
   
+    function partsFromISO(iso){
+      const p = iso.split("-");
+      const y = Number(p[0]);
+      const m = Number(p[1]);
+      const d = Number(p[2]);
+      return {
+        y: y,
+        m: m,
+        d: d
+      };
+    }
+  
+    function buildReminders(cfg, todayDate){
+      const out = [];
+      const dismissed = new Set(cfg.notificationsDismissed || []);
+      const todayISO = todayDate.toISOString().slice(0, 10);
+  
+      (cfg.tasks || []).forEach(function(t, i){
+        if(t.date === todayISO){
+          const id = "task_" + (t.date || "") + "_" + i;
+          if(!dismissed.has(id)){
+            out.push({
+              id: id,
+              label: "Task today",
+              title: t.title,
+              who: t.assignee,
+              date: t.date
+            });
+          }
+        }
+      });
+  
+      (cfg.proposals || []).forEach(function(p, i){
+        const baseId = "proposal_" + (p.id || i);
+        if(p.status === "pending"){
+          const id = baseId + "_pending";
+          if(!dismissed.has(id)){
+            out.push({
+              id: id,
+              label: "Proposal pending",
+              title: p.title,
+              who: p.proposer,
+              date: p.dateSubmitted || todayISO
+            });
+          }
+        }
+        if(p.status === "active"){
+          const ds = p.dateSubmitted || todayISO;
+          const diff = Math.abs(parseISO(todayISO) - parseISO(ds)) / 86400000;
+          if(diff <= 14){
+            const id = baseId + "_accepted";
+            if(!dismissed.has(id)){
+              out.push({
+                id: id,
+                label: "Proposal accepted",
+                title: p.title,
+                who: p.proposer,
+                date: ds
+              });
+            }
+          }
+        }
+      });
+  
+      return out;
+      }
+  
+    function dismissReminder(cfg, id){
+      if(!cfg.notificationsDismissed){
+        cfg.notificationsDismissed = [];
+      }
+      if(!cfg.notificationsDismissed.includes(id)){
+        cfg.notificationsDismissed.push(id);
+      }
+    }
+  
     return {
       parseISO: parseISO,
       todayFromStorage: todayFromStorage,
@@ -205,8 +287,11 @@ const RoomieDuty = (function(){
       uid: uid,
       assigneeKey: assigneeKey,
       classForAssignee: classForAssignee,
-      renderMonthGrid: renderMonthGrid
+      renderMonthGrid: renderMonthGrid,
+      buildReminders: buildReminders,
+      dismissReminder: dismissReminder
     };
   })();
+  
   
   

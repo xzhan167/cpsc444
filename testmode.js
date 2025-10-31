@@ -19,14 +19,14 @@ const TestMode = (function(){
         const s = JSON.parse(localStorage.getItem(STATE_KEY) || "{}");
         return {
           firstDay: s.firstDay || null,
-          countAt4FirstDay: Number(s.countAt4FirstDay || 0),
-          accepted: Boolean(s.accepted || false)
+          firstDay4pmAttempts: Number(s.firstDay4pmAttempts || 0),
+          acceptedOnSecondDay: Boolean(s.acceptedOnSecondDay || false)
         };
       }catch(e){
         return {
           firstDay: null,
-          countAt4FirstDay: 0,
-          accepted: false
+          firstDay4pmAttempts: 0,
+          acceptedOnSecondDay: false
         };
       }
     }
@@ -34,19 +34,30 @@ const TestMode = (function(){
     function saveState(st){
       localStorage.setItem(STATE_KEY, JSON.stringify({
         firstDay: st.firstDay,
-        countAt4FirstDay: st.countAt4FirstDay,
-        accepted: st.accepted
+        firstDay4pmAttempts: st.firstDay4pmAttempts,
+        acceptedOnSecondDay: st.acceptedOnSecondDay
       }));
     }
   
+    function partsFromISO(iso){
+      const p = iso.split("-");
+      const y = Number(p[0]);
+      const m = Number(p[1]);
+      const d = Number(p[2]);
+      return {
+        y: y,
+        m: m,
+        d: d
+      };
+    }
+  
     function isTargetDay(iso){
-      const d = new Date(iso + "T00:00:00");
-      const day = d.getDate();
-      return day === 21 || day === 24;
+      const d = partsFromISO(iso).d;
+      return d === 21 || d === 24;
     }
   
     function dayNumber(iso){
-      return new Date(iso + "T00:00:00").getDate();
+      return partsFromISO(iso).d;
     }
   
     function maybeSimulateProposal(args){
@@ -63,7 +74,7 @@ const TestMode = (function(){
   
       const st = loadState();
       const dNum = dayNumber(p.proposedDate);
-      const is4pm = (p.proposedTime || "").slice(0,5) === "16:00";
+      const is4pm = (p.proposedTime || "").slice(0, 5) === "16:00";
   
       if(!is4pm){
         setTimeout(function(){
@@ -79,19 +90,19 @@ const TestMode = (function(){
   
       if(st.firstDay === null){
         st.firstDay = dNum;
-        st.countAt4FirstDay = 0;
+        st.firstDay4pmAttempts = 0;
         saveState(st);
       }
   
       if(dNum === st.firstDay){
-        if(st.countAt4FirstDay === 0){
+        if(st.firstDay4pmAttempts === 0){
           setTimeout(function(){
             if(p.status !== "pending"){
               return;
             }
             p.status = "rejected";
             p.moderationNote = "Emma: sorry, i am really busy on this day";
-            st.countAt4FirstDay = 1;
+            st.firstDay4pmAttempts = 1;
             saveState(st);
             onChange();
           }, 7000);
@@ -103,14 +114,14 @@ const TestMode = (function(){
             }
             p.status = "rejected";
             p.moderationNote = "Emma: sorry, i really cant do it at that time.";
-            st.countAt4FirstDay = Math.max(2, st.countAt4FirstDay + 1);
+            st.firstDay4pmAttempts = st.firstDay4pmAttempts + 1;
             saveState(st);
             onChange();
           }, 7000);
           return;
         }
       }else{
-        if(st.countAt4FirstDay >= 1 && !st.accepted){
+        if(st.firstDay4pmAttempts >= 1 && !st.acceptedOnSecondDay){
           setTimeout(function(){
             if(p.status !== "pending"){
               return;
@@ -123,7 +134,7 @@ const TestMode = (function(){
               title: p.title + " " + (p.proposedTime || "16:00"),
               assignee: assignee
             });
-            st.accepted = true;
+            st.acceptedOnSecondDay = true;
             saveState(st);
             onChange();
           }, 10000);

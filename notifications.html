@@ -91,8 +91,9 @@ function avatarFor(name){
 
 function render(){
   const t0 = RoomieDuty.getTodayDate(cfg);
-  document.getElementById("todayInput").value = t0.toISOString().slice(0, 10);
-  document.getElementById("todayHint").textContent = "Using today: " + document.getElementById("todayInput").value;
+  const todayISO = t0.toISOString().slice(0, 10);
+  document.getElementById("todayInput").value = todayISO;
+  document.getElementById("todayHint").textContent = "Using today: " + todayISO;
 
   const list = document.getElementById("list");
   list.innerHTML = "";
@@ -111,7 +112,7 @@ function render(){
 
     const mid = document.createElement("div");
     const title = document.createElement("div");
-    title.innerHTML = `<span class="type">${r.label}:</span> ${r.title}`;
+    title.innerHTML = "<span class=\"type\">" + r.label + ":</span> " + r.title;
     const meta = document.createElement("div");
     meta.className = "meta";
     meta.textContent = r.date ? RoomieDuty.fmtDate(RoomieDuty.parseISO(r.date)) : "";
