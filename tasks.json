@@ -1,0 +1,24 @@
+{
+    "today": "2025-10-20",
+    "notes": [
+      {"label": "C", "assignee": "Sarah", "start": "2025-10-19", "end": "2025-10-25"}
+    ],
+    "tasks": [
+      {"date": "2025-10-12", "title": "Mop second room floors", "assignee": "You"},
+      {"date": "2025-10-12", "title": "Scrub kitchen sink", "assignee": "Emma"},
+      {"date": "2025-10-12", "title": "Clean stove top", "assignee": "Emma"},
+      {"date": "2025-10-13", "title": "Organize pantry", "assignee": "Sarah"},
+      {"date": "2025-10-14", "title": "Mop first room floors 10AM", "assignee": "You"},
+      {"date": "2025-10-14", "title": "Clean blinds 4PM", "assignee": "Emma"},
+      {"date": "2025-10-14", "title": "Clean mirrors 6PM", "assignee": "You"},
+      {"date": "2025-10-14", "title": "Scrub toaster 11AM", "assignee": "Sarah"},
+      {"date": "2025-10-15", "title": "Check for expired food 12AM", "assignee": "Sarah"},
+      {"date": "2025-10-15", "title": "Clean ceiling fan 4PM", "assignee": "Emma"},
+      {"date": "2025-10-15", "title": "Clean oven 2PM", "assignee": "Sarah"},
+      {"date": "2025-10-16", "title": "Empty trash can 1PM", "assignee": "You"},
+      {"date": "2025-10-17", "title": "Change bed sheets 10AM", "assignee": "Emma"},
+      {"date": "2025-10-22", "title": "Cut grass 4PM", "assignee": "Emma"},
+      {"date": "2025-10-23", "title": "Clean living room 4PM", "assignee": "You & Emma"},
+      {"date": "2025-10-25", "title": "Vacuum master bedroom 4PM", "assignee": "You"}
+    ]
+  }  

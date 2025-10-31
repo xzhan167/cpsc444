@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RoomieDuty – Dashboard</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#f3f4f6;color:#111}
+.app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+.aside{background:#e5e7eb;border-right:1px solid #d1d5db;display:flex;flex-direction:column;gap:16px;padding:16px}
+.brand{display:grid;place-items:center;height:80px;background:#fff;border-radius:12px;font-weight:800}
+.menu a{display:block;text-decoration:none;color:#111;padding:12px;border-radius:10px;margin-bottom:8px;background:#dbeafe}
+.menu a:nth-child(2){background:#e0f2fe}
+.menu a:nth-child(3){background:#e2e8f0}
+.menu a:nth-child(4){background:#fee2e2}
+.menu a:nth-child(5){background:#dcfce7}
+.footer{margin-top:auto;background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:12px;display:grid;gap:8px}
+.footer label{font-size:12px;color:#374151}
+.footer input{width:100%;padding:8px;border:1px solid #d1d5db;border-radius:8px}
+.footer .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.footer button,.btn{padding:10px 12px;border-radius:10px;border:1px solid #c7d2fe;background:#dbeafe}
+.main{padding:24px}
+.h1{font-size:40px;font-weight:800;margin:0 0 16px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.panel{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px}
+.panel h3{margin:0 0 12px;font-size:18px}
+.list{display:grid;gap:10px}
+.item{display:flex;justify-content:space-between;align-items:center;padding:12px;border:1px solid #e5e7eb;border-radius:10px;background:#fff}
+.badgepill{font-size:12px;padding:4px 8px;border-radius:999px}
+.color-you{background:#dbeafe}
+.color-sarah{background:#ede9fe}
+.color-emma{background:#dcfce7}
+.color-other{background:#e5e7eb}
+.border-you{border-left:4px solid #60a5fa}
+.border-sarah{border-left:4px solid #8b5cf6}
+.border-emma{border-left:4px solid #22c55e}
+.border-other{border-left:4px solid #9ca3af}
+.small{font-size:12px;color:#6b7280}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.kpi .label{font-size:12px;color:#6b7280}
+.kpi .val{display:grid;place-items:center;height:86px;border-radius:999px;background:#e0e7ff;font-size:22px;font-weight:700}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="aside">
+    <div class="brand">ROOMIE DUTY</div>
+    <nav class="menu">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="notifications.html">Notifications</a>
+      <a href="rules.html">House Rules</a>
+      <a href="calendar.html">Calendar</a>
+      <a href="proposals.html">Proposals</a>
+    </nav>
+    <div class="footer">
+      <label for="todayInput">Set today's date</label>
+      <input id="todayInput" type="date" />
+      <div class="row">
+        <button id="setTodayBtn">Set Today</button>
+        <button id="downloadJsonBtn">Download JSON</button>
+      </div>
+      <div class="small" id="todayHint"></div>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="h1">Dashboard</div>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>Recent activity</h3>
+        <div class="list">
+          <div class="item"><span>Me completed “Clean Kitchen”</span><span class="small">2 hours ago</span></div>
+          <div class="item"><span>Sarah scheduled event “House Meeting”</span><span class="small">5 hours ago</span></div>
+          <div class="item"><span>Emma created proposal “Friday movie night”</span><span class="small">1 day ago</span></div>
+          <div class="item"><span>You added rule “Monday 10pm quiet hours”</span><span class="small">2 days ago</span></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Upcoming tasks</h3>
+        <div class="list" id="upcoming"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="kpis">
+        <div class="kpi"><div class="label">Events this week</div><div class="val" id="kpi-week">0</div></div>
+        <div class="kpi"><div class="label">Tasks completed</div><div class="val">5</div></div>
+        <div class="kpi"><div class="label">Active proposals</div><div class="val">7</div></div>
+        <div class="kpi"><div class="label">Number of roommates</div><div class="val">3</div></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="roomieduty.js"></script>
+<script>
+let cfg = null;
+
+function labelForDate(d, t0){
+  const ms = 86400000;
+  const dd = Math.floor((d - t0) / ms);
+  if(dd < 0){
+    return "Overdue";
+  }
+  if(dd === 0){
+    return "Due Today";
+  }
+  if(dd === 1){
+    return "Due Tomorrow";
+  }
+  return d.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric"
+  });
+}
+
+function render(){
+  const t0 = RoomieDuty.getTodayDate(cfg);
+  const list = document.getElementById("upcoming");
+  list.innerHTML = "";
+
+  const tasks = [...(cfg.tasks || [])].sort(function(a, b){
+    return RoomieDuty.parseISO(a.date) - RoomieDuty.parseISO(b.date);
+  });
+
+  const upcoming = tasks.filter(function(t){
+    return RoomieDuty.parseISO(t.date) >= t0;
+  }).slice(0, 5);
+
+  upcoming.forEach(function(t){
+    const d = RoomieDuty.parseISO(t.date);
+    const k = RoomieDuty.classForAssignee(t.assignee).replace("color", "border");
+    const pillClass = "badgepill " + RoomieDuty.classForAssignee(t.assignee);
+    const row = document.createElement("div");
+    row.className = "item " + k;
+    row.innerHTML = `<div><div>${t.title}</div><div class="small">Due ${labelForDate(d, t0)}</div></div><div class="${pillClass}">${t.assignee || ""}</div>`;
+    list.appendChild(row);
+  });
+
+  const bin = RoomieDuty.weekBinRange(t0);
+  const countWeek = tasks.filter(function(t){
+    const d = RoomieDuty.parseISO(t.date);
+    return d >= bin.start && d <= bin.end;
+  }).length;
+
+  document.getElementById("kpi-week").textContent = String(countWeek);
+
+  const input = document.getElementById("todayInput");
+  input.value = t0.toISOString().slice(0, 10);
+  document.getElementById("todayHint").textContent = "Using today: " + input.value;
+
+  RoomieDuty.setupFooterControls(cfg, render);
+}
+
+function init(){
+  RoomieDuty.loadConfig().then(function(data){
+    cfg = data;
+    render();
+  }).catch(function(){
+    cfg = {
+      tasks: []
+    };
+    render();
+  });
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>

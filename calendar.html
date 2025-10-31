@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RoomieDuty – Calendar</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#f3f4f6;color:#111}
+.app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+.aside{background:#e5e7eb;border-right:1px solid #d1d5db;display:flex;flex-direction:column;gap:16px;padding:16px}
+.brand{display:grid;place-items:center;height:80px;background:#fff;border-radius:12px;font-weight:800}
+.menu a{display:block;text-decoration:none;color:#111;padding:12px;border-radius:10px;margin-bottom:8px;background:#fee2e2}
+.menu a:nth-child(1){background:#dbeafe}
+.menu a:nth-child(2){background:#e0f2fe}
+.menu a:nth-child(5){background:#dcfce7}
+.footer{margin-top:auto;background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:12px;display:grid;gap:8px}
+.footer label{font-size:12px;color:#374151}
+.footer input{width:100%;padding:8px;border:1px solid #d1d5db;border-radius:8px}
+.footer .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.footer button{padding:10px 12px;border-radius:10px;border:1px solid #c7d2fe;background:#dbeafe}
+.main{padding:24px}
+.h1{font-size:40px;font-weight:800;margin:0 0 16px}
+.legend{display:flex;gap:16px;background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px;margin-bottom:16px}
+.dot{width:10px;height:10px;border-radius:999px;display:inline-block;margin-right:6px}
+.dot.you{background:#93c5fd}
+.dot.sarah{background:#c4b5fd}
+.dot.emma{background:#86efac}
+.wrap{display:grid;grid-template-columns:1fr 340px;gap:16px}
+.panel{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px}
+.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px}
+.weekdays div{font-size:12px;color:#6b7280;text-align:center}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.day{min-height:96px;border:1px solid #e5e7eb;border-radius:8px;padding:6px;font-size:12px;display:flex;flex-direction:column;gap:6px;background:#fff}
+.empty{background:#f9fafb}
+.num{font-weight:700}
+.tag{font-size:10px;padding:2px 6px;border-radius:999px;width:max-content}
+.color-you{background:#dbeafe}
+.color-sarah{background:#ede9fe}
+.color-emma{background:#dcfce7}
+.color-other{background:#e5e7eb}
+.side h3{margin:0 0 8px;font-size:18px}
+.task{display:flex;justify-content:space-between;align-items:center;padding:12px;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:10px;background:#fff}
+.badgepill{font-size:12px;padding:4px 8px;border-radius:999px}
+.border-you{border-left:4px solid #60a5fa}
+.border-sarah{border-left:4px solid #8b5cf6}
+.border-emma{border-left:4px solid #22c55e}
+.border-other{border-left:4px solid #9ca3af}
+.small{font-size:12px;color:#6b7280}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="aside">
+    <div class="brand">ROOMIE DUTY</div>
+    <nav class="menu">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="notifications.html">Notifications</a>
+      <a href="rules.html">House Rules</a>
+      <a href="calendar.html">Calendar</a>
+      <a href="proposals.html">Proposals</a>
+    </nav>
+    <div class="footer">
+      <label for="todayInput">Set today's date</label>
+      <input id="todayInput" type="date" />
+      <div class="row">
+        <button id="setTodayBtn">Set Today</button>
+        <button id="downloadJsonBtn">Download JSON</button>
+      </div>
+      <div class="small" id="todayHint"></div>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="h1">Calendar</div>
+    <div class="legend">
+      <div><span class="dot you"></span>Me</div>
+      <div><span class="dot sarah"></span>Sarah</div>
+      <div><span class="dot emma"></span>Emma</div>
+    </div>
+    <div class="wrap">
+      <div class="panel">
+        <div class="head"><div id="monthLabel"></div><div class="small">◀ ▶</div></div>
+        <div class="weekdays" id="weekdays"></div>
+        <div class="cal" id="cal"></div>
+      </div>
+      <aside class="panel side">
+        <h3>This Week</h3>
+        <div id="week"></div>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<script src="roomieduty.js"></script>
+<script>
+const WEEK_LABELS = [
+  "Sun",
+  "Mon",
+  "Tue",
+  "Wed",
+  "Thu",
+  "Fri",
+  "Sat"
+];
+
+let cfg = null;
+
+function render(){
+  const t0 = RoomieDuty.getTodayDate(cfg);
+  const y = t0.getFullYear();
+  const m = t0.getMonth();
+
+  document.getElementById("monthLabel").textContent = t0.toLocaleDateString(undefined, {
+    month: "long",
+    year: "numeric"
+  });
+
+  const wd = document.getElementById("weekdays");
+  wd.innerHTML = "";
+  WEEK_LABELS.forEach(function(l){
+    const d = document.createElement("div");
+    d.textContent = l;
+    wd.appendChild(d);
+  });
+
+  const cal = document.getElementById("cal");
+  RoomieDuty.renderMonthGrid(cal, y, m);
+
+  const tasks = [...(cfg.tasks || [])].sort(function(a, b){
+    return RoomieDuty.parseISO(a.date) - RoomieDuty.parseISO(b.date);
+  });
+
+  tasks.forEach(function(t){
+    const cell = document.querySelector(`.day[data-date="${t.date}"]`);
+    if(cell){
+      const tag = document.createElement("div");
+      tag.className = "tag " + RoomieDuty.classForAssignee(t.assignee);
+      tag.textContent = t.title;
+      cell.appendChild(tag);
+    }
+  });
+
+  const weekBox = document.getElementById("week");
+  weekBox.innerHTML = "";
+  const bin = RoomieDuty.weekBinRange(t0);
+  tasks.forEach(function(t){
+    const d = RoomieDuty.parseISO(t.date);
+    if(d >= bin.start && d <= bin.end){
+      const k = RoomieDuty.classForAssignee(t.assignee).replace("color", "border");
+      const pillClass = "badgepill " + RoomieDuty.classForAssignee(t.assignee);
+      const row = document.createElement("div");
+      row.className = "task " + k;
+      row.innerHTML = `<div>${RoomieDuty.fmtDate(d)} • ${t.title}</div><div class="${pillClass}">${t.assignee || ""}</div>`;
+      weekBox.appendChild(row);
+    }
+  });
+
+  const input = document.getElementById("todayInput");
+  input.value = t0.toISOString().slice(0, 10);
+  document.getElementById("todayHint").textContent = "Using today: " + input.value;
+
+  RoomieDuty.setupFooterControls(cfg, render);
+}
+
+function init(){
+  RoomieDuty.loadConfig().then(function(data){
+    cfg = data;
+    render();
+  }).catch(function(){
+    cfg = {
+      tasks: []
+    };
+    render();
+  });
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
