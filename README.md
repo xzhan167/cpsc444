@@ -39,23 +39,23 @@ List of resources and references below. Some references to public approaches and
 
 Big CSS styling and layout, fixing crappy grid panel formatting (its still none scaling crap):
 
-https://css-tricks.com/building-a-dashboard-layout-with-css-grid/
+https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_grid_layout/Realizing_common_layouts_using_grids
+ 
 
 https://stackoverflow.com/questions/51928581/sidebar-layout-using-css-grid
 
-https://getbootstrap.com/docs/5.3/components/cards/
+https://blog.pixelfreestudio.com/how-to-use-css-grid-for-customizable-dashboard-layouts/
 
 https://getbootstrap.com/docs/5.3/components/badge/
 
 https://tailwindcss.com/docs/customizing-colors
 
-https://css-tricks.com/snippets/css/css-pills/
+https://medium.com/%40kevjose/building-dashboards-using-grid-and-flex-box-620adc1fff51
 
 Styling inspiration, font, style, rounded tables, and corners etc, obv adapted to our own lay out, color schemes, and design, but the rest of the freedom of style and formatting is inspired by some open source projects (i am not an art designer):
 
-https://www.freecodecamp.org/news/dashboard-using-css-grid/
+https://javascript.plainenglish.io/build-a-modern-dashboard-4-css-grid-techniques-for-complex-layouts-88cb5a90c34
 
-https://dribbble.com/shots/14484252-Minimal-Dashboard-UI
 
 https://codepen.io/collection/XdpzRP
 
@@ -87,9 +87,7 @@ https://stackoverflow.com/questions/15491894/compare-dates-in-javascript
 
 Calender quick implementation and public approaches:
 
-https://dev.to/sarah_chima/building-a-simple-calendar-in-javascript-3p1m
-
-https://medium.com/@tomanagle/create-a-simple-calendar-with-vanilla-javascript-9d6a2b8e64f1
+https://martinfowler.com/articles/feature-toggles.html
 
 https://stackoverflow.com/questions/70995014/creating-calendar-with-grid-temlate
 
@@ -129,7 +127,7 @@ https://stackoverflow.com/questions/3263161/how-do-i-run-an-if-else-statement-ba
 
 https://stackoverflow.com/questions/69200222/javascript-local-storage-mixing-up-toggle-keys
 
-https://medium.com/frontend-digest/how-to-add-a-feature-toggle-to-your-javascript-app-cc8baf9c0a7d
+https://dev.to/hexshift/building-robust-feature-flags-in-javascript-from-basics-to-gradual-rollouts-11f2
 
 https://stackoverflow.com/questions/36226215/how-to-store-and-restore-a-small-json-state-in-localstorage
 
