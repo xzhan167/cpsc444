@@ -123,11 +123,11 @@ const RoomieDuty = (function(){
       if(!cfg.notes){
         cfg.notes = [];
       }
-      if(!cfg.notificationsDismissed){
-        cfg.notificationsDismissed = [];
-      }
       if(!cfg.proposals){
         cfg.proposals = [];
+      }
+      if(!cfg.notificationsDismissed){
+        cfg.notificationsDismissed = [];
       }
       if(!cfg.rules){
         cfg.rules = [];
@@ -140,15 +140,15 @@ const RoomieDuty = (function(){
     }
   
     function assigneeKey(name){
-      const n = (name || "").toLowerCase().trim();
-      if(n === "you" || n === "me" || n === "a"){
+      const n = (name || "").toLowerCase();
+      if(n.includes("you") || n === "me" || n === "a"){
         return "you";
       }
-      if(n.indexOf("emma") !== -1){
-        return "emma";
-      }
-      if(n.indexOf("sarah") !== -1){
+      if(n.includes("sarah")){
         return "sarah";
+      }
+      if(n.includes("emma")){
+        return "emma";
       }
       return "other";
     }
@@ -158,11 +158,11 @@ const RoomieDuty = (function(){
       if(k === "you"){
         return "color-you";
       }
-      if(k === "emma"){
-        return "color-emma";
-      }
       if(k === "sarah"){
         return "color-sarah";
+      }
+      if(k === "emma"){
+        return "color-emma";
       }
       return "color-other";
     }
@@ -190,49 +190,6 @@ const RoomieDuty = (function(){
       }
     }
   
-    function buildReminders(cfg, t0){
-      const isoToday = t0.toISOString().slice(0, 10);
-      const reminders = [];
-      (cfg.tasks || []).forEach(function(t){
-        if(t.date === isoToday){
-          const id = "task|" + t.date + "|" + t.title;
-          reminders.push({
-            id: id,
-            type: "task",
-            label: "Task soon",
-            title: t.title,
-            who: t.assignee || "",
-            date: t.date
-          });
-        }
-      });
-      (cfg.proposals || []).forEach(function(p){
-        const id = "proposal|" + (p.status || "pending") + "|" + (p.id || p.title);
-        const label = p.status === "passed" ? "Proposal passed" : "Proposal pending";
-        reminders.push({
-          id: id,
-          type: "proposal",
-          label: label,
-          title: p.title || "",
-          who: p.proposer || "",
-          date: p.dateSubmitted || ""
-        });
-      });
-      const dismissed = new Set(cfg.notificationsDismissed || []);
-      return reminders.filter(function(r){
-        return !dismissed.has(r.id);
-      });
-    }
-  
-    function dismissReminder(cfg, id){
-      if(!cfg.notificationsDismissed){
-        cfg.notificationsDismissed = [];
-      }
-      if(!cfg.notificationsDismissed.includes(id)){
-        cfg.notificationsDismissed.push(id);
-      }
-    }
-  
     return {
       parseISO: parseISO,
       todayFromStorage: todayFromStorage,
@@ -248,9 +205,8 @@ const RoomieDuty = (function(){
       uid: uid,
       assigneeKey: assigneeKey,
       classForAssignee: classForAssignee,
-      renderMonthGrid: renderMonthGrid,
-      buildReminders: buildReminders,
-      dismissReminder: dismissReminder
+      renderMonthGrid: renderMonthGrid
     };
   })();
+  
   

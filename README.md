@@ -29,4 +29,6 @@ This will start a local server, as browsers by default blocks JSON fetch request
 http://localhost:8000/dashboard.html
 
 Congrats, now you have a local version of the app running!
-Keep track of changes and load your changes by downloading the JSON (your saved data) every time you finish, then replace the local version by the downloaded version in your project directory before loading up the project the next time and your data/changes will be carried over!
+Keep track of changes and load your changes by downloading the JSON (your saved data) every time you make a change, replace the local version by the downloaded version in your project directory then refresh to see it changed permanently!
+
+This functionality is limited as due to a lack of server hosting, we dont have an easy way to save and update the config file, as such, you must do so manually.

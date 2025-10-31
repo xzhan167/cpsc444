@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RoomieDuty Proposals</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#f3f4f6;color:#111}
+.app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+.aside{background:#e5e7eb;border-right:1px solid #d1d5db;display:flex;flex-direction:column;gap:16px;padding:16px}
+.brand{display:grid;place-items:center;height:80px;background:#fff;border-radius:12px;font-weight:800}
+.menu a{display:block;text-decoration:none;color:#111;padding:12px;border-radius:10px;margin-bottom:8px;background:#e2e8f0}
+.menu a:nth-child(1){background:#dbeafe}
+.menu a:nth-child(2){background:#e0f2fe}
+.menu a:nth-child(4){background:#fee2e2}
+.menu a:nth-child(5){background:#dcfce7}
+.footer{margin-top:auto;background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:12px;display:grid;gap:8px}
+.footer label{font-size:12px;color:#374151}
+.footer input{width:100%;padding:8px;border:1px solid #d1d5db;border-radius:8px}
+.footer .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.footer button{padding:10px 12px;border-radius:10px;border:1px solid #c7d2fe;background:#dbeafe}
+.main{padding:24px;display:grid;grid-template-rows:auto auto 1fr;gap:12px}
+.h1{font-size:40px;font-weight:800;margin:0}
+.toolbar{display:flex;justify-content:space-between;align-items:center}
+.btn{padding:10px 12px;border-radius:10px;border:1px solid #c7d2fe;background:#dbeafe}
+.grid{display:grid;grid-template-columns:1fr 360px;gap:16px}
+.list{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:12px;overflow:auto;max-height:68vh;display:grid;gap:12px}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:12px;display:grid;gap:8px}
+.row{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.badge{padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid #d1d5db;background:#f9fafb}
+.form{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:12px;display:grid;gap:8px;height:fit-content}
+.form input,.form select,.form textarea{width:100%;padding:8px;border:1px solid #d1d5db;border-radius:8px;background:#fff}
+.form textarea{min-height:96px;resize:vertical}
+.minical{border:1px solid #e5e7eb;border-radius:12px;padding:10px;display:grid;gap:6px}
+.mhead{display:flex;justify-content:space-between;align-items:center}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.day{border:1px solid #e5e7eb;border-radius:8px;height:44px;position:relative;display:grid;place-items:start}
+.day .num{font-size:12px;padding:4px}
+.day.taken{background:#fee2e2}
+.day.empty{background:#f3f4f6;border-style:dashed}
+.meta{font-size:12px;color:#6b7280}
+.controls{display:flex;gap:8px}
+.inputrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.del{padding:8px 10px;border-radius:10px;border:1px solid #d1d5db;background:#f9fafb}
+.toast{position:fixed;right:16px;bottom:16px;background:#111;color:#fff;padding:10px 14px;border-radius:10px;opacity:0;transform:translateY(8px);transition:.2s}
+.toast.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="aside">
+    <div class="brand">ROOMIE DUTY</div>
+    <nav class="menu">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="notifications.html">Notifications</a>
+      <a href="rules.html">House Rules</a>
+      <a href="calendar.html">Calendar</a>
+      <a href="proposals.html">Proposals</a>
+    </nav>
+    <div class="footer">
+      <label for="todayInput">Set today's date</label>
+      <input id="todayInput" type="date" />
+      <div class="row">
+        <button id="setTodayBtn">Set Today</button>
+      </div>
+      <div class="row">
+        <button id="downloadJsonBtn">Download JSON</button>
+      </div>
+      <div class="meta" id="todayHint"></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="h1">Proposals</div>
+    <div class="toolbar">
+      <div class="meta">Newest to oldest</div>
+      <div></div>
+    </div>
+
+    <div class="grid">
+      <div id="list" class="list"></div>
+
+      <div class="form">
+        <div class="row">
+          <div class="meta">Create New Proposal</div>
+        </div>
+        <label>Proposed task name</label>
+        <input id="pTitle" type="text" />
+        <label>Participating members</label>
+        <select id="pMembers" multiple>
+          <option value="You">Me</option>
+          <option value="Sarah">Sarah</option>
+          <option value="Emma">Emma</option>
+        </select>
+        <label>Written description</label>
+        <textarea id="pDesc"></textarea>
+        <div class="inputrow">
+          <div>
+            <label>Proposed time</label>
+            <input id="pDate" type="date" />
+          </div>
+          <div>
+            <label>Proposed by</label>
+            <select id="pProposer">
+              <option value="You">Me</option>
+              <option value="Sarah">Sarah</option>
+              <option value="Emma">Emma</option>
+            </select>
+          </div>
+        </div>
+        <div class="minical">
+          <div class="mhead">
+            <div class="meta" id="miniMonthLabel"></div>
+          </div>
+          <div class="calgrid" id="miniCal"></div>
+          <div class="meta">Red days already have tasks</div>
+        </div>
+        <button id="submitBtn" class="btn">Submit</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast" class="toast">Saved</div>
+
+<script src="roomieduty.js"></script>
+<script>
+let cfg = null;
+
+function dayHasTask(iso){
+  return (cfg.tasks || []).some(function(t){
+    return t.date === iso;
+  });
+}
+
+function refreshMiniCal(){
+  const input = document.getElementById("pDate");
+  const val = input.value || new Date().toISOString().slice(0,10);
+  const d = RoomieDuty.parseISO(val);
+  const year = d.getFullYear();
+  const month = d.getMonth();
+  const label = d.toLocaleDateString(undefined, {
+    month: "long",
+    year: "numeric"
+  });
+  document.getElementById("miniMonthLabel").textContent = label;
+
+  const grid = document.getElementById("miniCal");
+  RoomieDuty.renderMonthGrid(grid, year, month);
+  Array.from(grid.querySelectorAll(".day")).forEach(function(cell){
+    const iso = cell.dataset.date;
+    if(!iso){
+      return;
+    }
+    if(dayHasTask(iso)){
+      cell.classList.add("taken");
+    }
+    cell.addEventListener("click", function(){
+      input.value = iso;
+      refreshMiniCal();
+    });
+  });
+}
+
+function proposalRow(p){
+  const card = document.createElement("div");
+  card.className = "card";
+
+  const top = document.createElement("div");
+  top.className = "row";
+
+  const title = document.createElement("div");
+  title.textContent = p.title;
+
+  const status = document.createElement("div");
+  status.className = "badge";
+  status.textContent = p.status;
+
+  top.appendChild(title);
+  top.appendChild(status);
+
+  const meta = document.createElement("div");
+  meta.className = "meta";
+  meta.textContent = (p.dateSubmitted || "") + " • proposed by " + (p.proposer || "") + " • " + (p.members || []).join(", ");
+
+  const desc = document.createElement("div");
+  desc.textContent = p.description || "";
+
+  card.appendChild(top);
+  card.appendChild(meta);
+  card.appendChild(desc);
+
+  if(p.moderationNote){
+    const note = document.createElement("div");
+    note.className = "meta";
+    note.textContent = p.moderationNote;
+    card.appendChild(note);
+  }
+
+  if(p.status === "pending"){
+    const input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = "Optional comment";
+    const controls = document.createElement("div");
+    controls.className = "controls";
+
+    const accept = document.createElement("button");
+    accept.className = "btn";
+    accept.textContent = "Accept";
+    accept.addEventListener("click", function(){
+      const date = p.proposedDate;
+      if(dayHasTask(date)){
+        RoomieDuty.showToast("Date taken");
+        return;
+      }
+      const assignee = (p.members || []).join(" & ");
+      cfg.tasks.push({
+        date: date,
+        title: p.title,
+        assignee: assignee
+      });
+      p.status = "active";
+      p.moderationNote = input.value || "";
+      render();
+      RoomieDuty.showToast("Accepted");
+    });
+
+    const reject = document.createElement("button");
+    reject.className = "del";
+    reject.textContent = "Reject";
+    reject.addEventListener("click", function(){
+      p.status = "rejected";
+      p.moderationNote = input.value || "";
+      render();
+      RoomieDuty.showToast("Rejected");
+    });
+
+    controls.appendChild(accept);
+    controls.appendChild(reject);
+    card.appendChild(input);
+    card.appendChild(controls);
+  }
+
+  return card;
+}
+
+function render(){
+  const t0 = RoomieDuty.getTodayDate(cfg);
+  document.getElementById("todayInput").value = t0.toISOString().slice(0,10);
+  document.getElementById("todayHint").textContent = "Using today: " + document.getElementById("todayInput").value;
+
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  const items = [...(cfg.proposals || [])].sort(function(a, b){
+    return RoomieDuty.parseISO(b.dateSubmitted || "1970-01-01") - RoomieDuty.parseISO(a.dateSubmitted || "1970-01-01");
+  });
+
+  items.forEach(function(p){
+    list.appendChild(proposalRow(p));
+  });
+
+  refreshMiniCal();
+  RoomieDuty.setupFooterControls(cfg, render);
+}
+
+function submitProposal(){
+  const title = document.getElementById("pTitle").value.trim();
+  const membersSel = document.getElementById("pMembers");
+  const members = Array.from(membersSel.selectedOptions).map(function(o){
+    return o.value;
+  });
+  const desc = document.getElementById("pDesc").value.trim();
+  const date = document.getElementById("pDate").value;
+  const proposer = document.getElementById("pProposer").value;
+
+  if(!title || !date || members.length === 0){
+    RoomieDuty.showToast("Missing fields");
+    return;
+  }
+  if(dayHasTask(date)){
+    RoomieDuty.showToast("Date taken");
+    return;
+  }
+
+  const p = {
+    id: RoomieDuty.uid(),
+    title: title,
+    members: members,
+    description: desc,
+    proposedDate: date,
+    proposer: proposer,
+    status: "pending",
+    dateSubmitted: new Date().toISOString().slice(0,10)
+  };
+  cfg.proposals.push(p);
+
+  document.getElementById("pTitle").value = "";
+  document.getElementById("pDesc").value = "";
+  document.getElementById("pDate").value = "";
+  Array.from(membersSel.options).forEach(function(o){
+    o.selected = false;
+  });
+
+  render();
+  RoomieDuty.showToast("Submitted");
+}
+
+function init(){
+  RoomieDuty.loadConfig().then(function(data){
+    cfg = data;
+    render();
+  }).catch(function(){
+    cfg = {
+      today: null,
+      tasks: [],
+      proposals: []
+    };
+    render();
+  });
+
+  document.getElementById("pDate").addEventListener("change", refreshMiniCal);
+  document.getElementById("submitBtn").addEventListener("click", submitProposal);
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
