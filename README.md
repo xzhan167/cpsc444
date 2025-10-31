@@ -4,6 +4,8 @@ RoomieDuty is a roomate management app for roommates to communicate and manage c
 
 SETTING UP:
 
+0) Download project and unzip into a folder to local computer
+
 1) Installing python:
 
 Windows: https://www.python.org/downloads/
