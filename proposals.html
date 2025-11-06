@@ -150,7 +150,7 @@ function dayHasTask(iso){
 
 function refreshMiniCal(){
   const input = document.getElementById("pDate");
-  const val = input.value || new Date().toISOString().slice(0,10);
+  const val = input.value || RoomieDuty.getTodayDate(cfg).toISOString().slice(0,10);
   const d = RoomieDuty.parseISO(val);
   const year = d.getFullYear();
   const month = d.getMonth();
